@@ -27,9 +27,10 @@ const getSongs = function (songName) {
         songName = "The Sign Ace of Base"
         console.log(songName)
     };
-    spotify.search({ type: 'track', query: songName, limit: 3}).then(function (data) {
+    spotify.search({ type: 'track', query: songName, limit: 1 }).then(function (data) {
         let spotifyArr = data.tracks.items;
         for (i = 0; i < spotifyArr.length; i++) {
+            console.log("-------")
             console.log("Artists: " + data.tracks.items[i].artists[0].name)
             console.log("Name: " + data.tracks.items[i].name)
             console.log("URL: " + data.tracks.items[i].external_urls.spotify)
@@ -37,8 +38,8 @@ const getSongs = function (songName) {
             console.log("-------")
         };
     })
-        .catch(function (error) {
-            console.log(error.response);
+        .catch(function (err) {
+            console.log('Error occurred: ' + err);
         })
 };
 
@@ -65,7 +66,7 @@ const getMovies = function (movieName) {
 };
 
 const doWhatItSays = function () {
-    fs.readFile("random.txt", "utf8", function (err, data) {
+    fs.readFile("random.txt", "utf8", function(err, data) {
         if (err) {
             return console.log(err);
         }
@@ -75,23 +76,32 @@ const doWhatItSays = function () {
 }
 
 let pick = function (response, userChoice) {
-    switch (response) {
-        case "concert-this":
-            getEvents(userChoice);
-            break;
-        case "spotify-this-song":
-            getSongs(userChoice);
-            break;
-        case "movie-this":
-            getMovies(userChoice);
-            break;
-        case "do-what-it-says":
-            doWhatItSays();
-            break;
-        default:
-            console.log("LIRI doesn't recognize command")
+
+    let savePick = "\n" + response + "," + userChoice + ",";
+    fs.appendFile("log.txt", savePick, function(err) {
+        if (err) {
+            console.log(err);
+        }
+
+        switch (response) {
+            case "concert-this":
+                getEvents(userChoice);
+                break;
+            case "spotify-this-song":
+                getSongs(userChoice);
+                break;
+            case "movie-this":
+                getMovies(userChoice);
+                break;
+            case "do-what-it-says":
+                doWhatItSays();
+                break;
+            default:
+                console.log("LIRI doesn't recognize command")
+        }
     }
-}
+    )
+};
 const runCommand = function (arg1, arg2) {
     pick(arg1, arg2)
 }
